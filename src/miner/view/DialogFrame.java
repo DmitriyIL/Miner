@@ -1,6 +1,6 @@
-package Miner.View;
+package miner.view;
 
-import Miner.MinerFrame;
+import miner.MinerFrame;
 
 import javax.swing.*;
 

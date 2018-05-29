@@ -1,4 +1,4 @@
-package Miner.model;
+package miner.model;
 
 
 import java.util.LinkedList;
@@ -8,7 +8,7 @@ import java.util.Random;
 public class Field {
 
     private int width, height, mines, flags;
-    private Cell[][] field;
+    private Cell[][] cellsMatrix;
     private int restCells;
 
 
@@ -24,17 +24,19 @@ public class Field {
 
 
     public Cell getCell(int width, int height) {
-        return field[width][height];
+        return cellsMatrix[width][height];
     }
-
 
     public Cell getCell(Position pos) {
-        return field[pos.w][pos.h];
+        return cellsMatrix[pos.col][pos.row];
     }
 
+    public Cell[][] getCellsMatrix() {
+        return cellsMatrix;
+    }
 
     private void createField() {
-        field = new Cell[width][height];
+        cellsMatrix = new Cell[width][height];
 
         Random rand = new Random();
         byte mined = (byte) (Cell.closedCell + Cell.minedCell);
@@ -48,14 +50,14 @@ public class Field {
         for (int countMines = 0; countMines < mines; countMines++) {
             int index = rand.nextInt(restPositions.size());
             Position cellPos = restPositions.get(index);
-            field[cellPos.w][cellPos.h] = new Cell(mined);
+            cellsMatrix[cellPos.col][cellPos.row] = new Cell(mined);
             restPositions.remove(index);
         }
 
         // set other cells
         for (Position cellPos : restPositions) {
             byte minesAround = countMinesAroundCell(cellPos);
-            field[cellPos.w][cellPos.h] = new Cell(Cell.closedCell + minesAround);
+            cellsMatrix[cellPos.col][cellPos.row] = new Cell(Cell.closedCell + minesAround);
         }
     }
 
@@ -66,8 +68,8 @@ public class Field {
 
         for (Position posAround : positionsAround) {
             if (cellExist(posAround)
-                    && field[posAround.w][posAround.h] != null
-                    && field[posAround.w][posAround.h].isMined())
+                    && cellsMatrix[posAround.col][posAround.row] != null
+                    && cellsMatrix[posAround.col][posAround.row].isMined())
                 result++;
         }
 
@@ -76,7 +78,7 @@ public class Field {
 
 
     public boolean cellExist(Position cellPos) {
-        return cellPos.w >= 0 && cellPos.w < width && cellPos.h >= 0 && cellPos.h < height;
+        return cellPos.col >= 0 && cellPos.col < width && cellPos.row >= 0 && cellPos.row < height;
     }
 
 
@@ -85,20 +87,20 @@ public class Field {
         Position positionsAround[];
 
         // even rows
-        if (cellPos.h % 2 == 0) {
+        if (cellPos.row % 2 == 0) {
             positionsAround = new Position[]{
-                    new Position(cellPos.w, cellPos.h - 1), new Position(cellPos.w - 1, cellPos.h - 1),
-                    new Position(cellPos.w + 1, cellPos.h), new Position(cellPos.w - 1, cellPos.h + 1),
-                    new Position(cellPos.w, cellPos.h + 1), new Position(cellPos.w - 1, cellPos.h)
+                    new Position(cellPos.col, cellPos.row - 1), new Position(cellPos.col - 1, cellPos.row - 1),
+                    new Position(cellPos.col + 1, cellPos.row), new Position(cellPos.col - 1, cellPos.row + 1),
+                    new Position(cellPos.col, cellPos.row + 1), new Position(cellPos.col - 1, cellPos.row)
             };
         }
 
         // odd rows
         else {
             positionsAround = new Position[]{
-                    new Position(cellPos.w, cellPos.h - 1), new Position(cellPos.w + 1, cellPos.h - 1),
-                    new Position(cellPos.w + 1, cellPos.h), new Position(cellPos.w + 1, cellPos.h + 1),
-                    new Position(cellPos.w, cellPos.h + 1), new Position(cellPos.w - 1, cellPos.h)
+                    new Position(cellPos.col, cellPos.row - 1), new Position(cellPos.col + 1, cellPos.row - 1),
+                    new Position(cellPos.col + 1, cellPos.row), new Position(cellPos.col + 1, cellPos.row + 1),
+                    new Position(cellPos.col, cellPos.row + 1), new Position(cellPos.col - 1, cellPos.row)
             };
         }
 

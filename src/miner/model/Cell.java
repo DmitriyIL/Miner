@@ -1,4 +1,4 @@
-package Miner.model;
+package miner.model;
 
 public class Cell {
     public static final int openedCell = 0;

@@ -1,9 +1,9 @@
-package Miner;
+package miner;
 
-import Miner.View.DialogFrame;
-import Miner.View.FieldPanel;
-import Miner.View.MenuPanel;
-import Miner.model.Game;
+import miner.view.DialogFrame;
+import miner.view.FieldPanel;
+import miner.view.MenuPanel;
+import miner.model.Game;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -91,7 +91,7 @@ public class MinerFrame extends JFrame {
 
     private void initFrame() {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Miner");
+        setTitle("miner");
         validateFrame();
         setIconImage(FieldPanel.getImage("ic_launcher"));
     }

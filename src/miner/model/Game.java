@@ -1,7 +1,7 @@
-package Miner.model;
+package miner.model;
 
 
-import Miner.MinerFrame;
+import miner.MinerFrame;
 
 import java.awt.Point;
 
@@ -14,8 +14,8 @@ public class Game {
     public static final int winGameState = 3;
 
     private int gameState;
-
     private int width, height;
+
 
     public Game(int width, int height, int mines) {
         this.width = width;
@@ -43,8 +43,8 @@ public class Game {
 
         Position pressedPos = fieldPointToFieldCell(x, y, MinerFrame.pixWidth, MinerFrame.pixHeight);
 
-        if (pressedPos.w < 0 || pressedPos.w >= width) return;
-        if (pressedPos.h < 0 || pressedPos.h >= height) return;
+        if (pressedPos.col < 0 || pressedPos.col >= width) return;
+        if (pressedPos.row < 0 || pressedPos.row >= height) return;
 
         Cell pressedCell = field.getCell(pressedPos);
 
@@ -65,8 +65,8 @@ public class Game {
 
         Position pressedPos = fieldPointToFieldCell(x, y, MinerFrame.pixWidth, MinerFrame.pixHeight);
 
-        if (pressedPos.w < 0 || pressedPos.w >= width) return;
-        if (pressedPos.h < 0 || pressedPos.h >= height) return;
+        if (pressedPos.col < 0 || pressedPos.col >= width) return;
+        if (pressedPos.row < 0 || pressedPos.row >= height) return;
 
         field.markCell(pressedPos);
 
@@ -74,18 +74,18 @@ public class Game {
     }
 
 
-    public Position fieldPointToFieldCell(int x, int y, int CellPixWidth, int CellPixHeight) {
+    public Position fieldPointToFieldCell(int x, int y, int CellWidth, int CellHeight) {
 
-        float height25 = CellPixHeight * 0.25f; //высота пустого треугольника вверху и внизу поля
-        float height75 = CellPixHeight * 0.75f;
+        float height25 = CellHeight * 0.25f; //высота пустого треугольника вверху и внизу поля
+        float height75 = CellHeight * 0.75f;
 
         int firstRow = (int) Math.floor((y - height25) / height75);
         int lastRow = (int) Math.floor(y / height75);
 
-        float width50 = CellPixWidth * 0.50f;
+        float width50 = CellWidth * 0.50f;
 
-        int colInEvenRow = (int) Math.floor(x / CellPixWidth);
-        int colInOddRow = (int) Math.floor((x - width50) / CellPixWidth);
+        int colInEvenRow = (int) Math.floor(x / CellWidth);
+        int colInOddRow = (int) Math.floor((x - width50) / CellWidth);
 
         Point pressPoint = new Point(x, y);
         int minDistanceToPressPoint = Integer.MAX_VALUE;
@@ -94,10 +94,7 @@ public class Game {
         for (int row = firstRow; row <= lastRow; row++) {
             int col = (row % 2 == 0) ? colInEvenRow : colInOddRow;
 
-            int centerX = (int) ((col + 1) * CellPixWidth - ((row % 2 == 0) ? width50 : 0));
-            int centerY = (int) ((row + 1) * height75 - height25);
-
-            Point center = new Point(centerX, centerY);
+            Point center = findCellCenter(col, row);
             double distanceToPressPoint = center.distance(pressPoint);
             if (distanceToPressPoint < minDistanceToPressPoint) {
                 minDistanceToPressPoint = (int) distanceToPressPoint;
@@ -105,6 +102,17 @@ public class Game {
             }
         }
         return pressedCellPos;
+    }
+
+
+    public Point findCellCenter(int col, int row) {
+        int cellWidth = MinerFrame.pixWidth;
+        int cellHeight = MinerFrame.pixHeight;
+
+        int centerX = (int) ((col + 1) * cellWidth - ((row % 2 == 0) ? cellWidth * 0.50f : 0));
+        int centerY = (int) ((row + 1) * cellHeight * 0.75f - cellHeight * 0.25f);
+
+        return new Point(centerX, centerY);
     }
 
 }

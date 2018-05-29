@@ -1,4 +1,4 @@
-package Miner.View;
+package miner.view;
 
 
 import javax.swing.*;

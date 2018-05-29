@@ -1,9 +1,9 @@
-package Miner.View;
+package miner.view;
 
-import Miner.MinerFrame;
-import Miner.model.Cell;
-import Miner.model.Field;
-import Miner.model.Game;
+import miner.MinerFrame;
+import miner.model.Cell;
+import miner.model.Field;
+import miner.model.Game;
 
 import javax.swing.*;
 import java.awt.*;
