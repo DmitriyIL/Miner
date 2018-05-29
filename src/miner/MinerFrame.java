@@ -73,7 +73,7 @@ public class MinerFrame extends JFrame {
         toolbar.add(restart);
 
         toolbar.addSeparator();
-        JButton menuButton = new JButton(new ImageIcon("res/img/menuPanel.png"));
+        JButton menuButton = new JButton(new ImageIcon("res/img/menu.png"));
         menuButton.addActionListener(toMenuListener);
         toolbar.add(menuButton);
 

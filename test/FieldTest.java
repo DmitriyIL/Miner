@@ -56,7 +56,7 @@ public class FieldTest {
                 new Position(bombPos.col + 2, bombPos.row) : //открыть все клетки кроме флажка
                 new Position(bombPos.col - 2, bombPos.row);
         Point emptyCellCoords = game.findCellCenter(emptyCellPos.col, emptyCellPos.row);
-        game.pressLeftButton(emptyCellCoords.x, emptyCellCoords.y); //тыкаем на клетку
+        game.pressLeftButton(emptyCellCoords.x, emptyCellCoords.y); //тыкаем на путсую клетку
 
         assertEquals(Game.winGameState, game.getGameState());
     }
