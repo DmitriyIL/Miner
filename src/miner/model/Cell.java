@@ -13,12 +13,12 @@ package miner.model;
  * просто закрыта.
  */
 public class Cell {
-    static final int closedCell = 10;
-    static final int questionedCell = 20;
-    static final int flagedCell = 30;
+    public static final byte closedCell = 10;
+    public static final byte questionedCell = 20;
+    public static final byte flagedCell = 30;
 
-    static final int blastedCell = 8;
-    static final int minedCell = 9;
+    public static final byte blastedCell = 8;
+    public static final byte minedCell = 9;
 
     private byte state;
 

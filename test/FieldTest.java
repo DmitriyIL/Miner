@@ -34,7 +34,7 @@ public class FieldTest {
         Point p = game.findCellCenter(0, 0);
         game.pressLeftButton(p.x, p.y);
 
-        assertEquals(Game.actionGameState, game.getGameState());
+        assertEquals(Game.GameStatus.ACTION, game.getGameState());
 
         Field field = game.getField();
         Cell[][] cellsMatr = field.getCellsMatrix();
@@ -48,7 +48,7 @@ public class FieldTest {
         Field field = game.getField();
         Cell[][] cellsMatr = field.getCellsMatrix();
 
-        assertEquals(Game.actionGameState, game.getGameState());
+        assertEquals(Game.GameStatus.ACTION, game.getGameState());
 
         int bombsAmt = 0;
         for (Cell[] cellArr : cellsMatr) {
@@ -61,7 +61,7 @@ public class FieldTest {
         Position bombPos = findBomb(cellsMatr);
         Point bombCoords = game.findCellCenter(bombPos.col, bombPos.row);
         game.pressLeftButton(bombCoords.x, bombCoords.y); // иммитируем нажатие на бомбу
-        assertEquals(Game.loseGameState, game.getGameState());
+        assertEquals(Game.GameStatus.LOSE, game.getGameState());
         assertTrue(cellsMatr[bombPos.col][bombPos.row].isBlasted()); //указано ли, что взорвана бомба
     }
 
@@ -93,7 +93,7 @@ public class FieldTest {
         Point emptyCellCoords = game.findCellCenter(emptyCellPos.col, emptyCellPos.row);
         game.pressLeftButton(emptyCellCoords.x, emptyCellCoords.y); //тыкаем на путсую клетку
 
-        assertEquals(Game.winGameState, game.getGameState());
+        assertEquals(Game.GameStatus.WIN, game.getGameState());
     }
 
 

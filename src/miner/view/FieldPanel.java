@@ -3,9 +3,11 @@ package miner.view;
 import miner.MinerFrame;
 import miner.model.Cell;
 import miner.model.Field;
+import miner.model.Position;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.LinkedList;
 
 
 /**
@@ -14,7 +16,6 @@ import java.awt.*;
  */
 public class FieldPanel extends JPanel {
 
-    private int cols, rows;
     private int pixWidth, pixHeight;
 
 
@@ -27,8 +28,6 @@ public class FieldPanel extends JPanel {
      * @param pixHeight - длина одно шестиугольника в пикселях.
      */
     public FieldPanel(int cols, int rows, int pixWidth, int pixHeight) {
-        this.cols = cols;
-        this.rows = rows;
         this.pixHeight = pixHeight;
         this.pixWidth = pixWidth;
 
@@ -37,35 +36,20 @@ public class FieldPanel extends JPanel {
     }
 
 
-    private void drawClosedField(Graphics g) {
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                int startX = j * pixWidth + ((i % 2 == 1) ? (int) (0.5 * pixWidth) : 0);
-                int startY = i * (int) (pixHeight * 0.75);
-                Point start = new Point(startX, startY);
-
-                drawImg(g, 13, start); //13 - закрытая клетка
-            }
-        }
-    }
-
-
     /**
      * Рисует поле игры в панели.
-     * @param field - класс модели поля, хранящий всю информацию о состоянии поля.
+     * @param cellsForRedraw - класс модели поля, хранящий всю информацию о состоянии поля.
      */
-    private void drawField(Field field, Graphics g) {
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                int startX = j * pixWidth + ((i % 2 == 1) ? (int) (0.5 * pixWidth) : 0);
-                int startY = i * (int) (pixHeight * 0.75);
+    private void redrawCells(LinkedList<Position> cellsForRedraw, Graphics g) {
+        for (Position pos: cellsForRedraw) {
+                int startX = pos.col * pixWidth + ((pos.row % 2 == 1) ? (int) (0.5 * pixWidth) : 0);
+                int startY = pos.row * (int) (pixHeight * 0.75);
                 Point start = new Point(startX, startY);
 
-                Cell cell = field.getCell(j, i);
+                Cell cell = MinerFrame.getGame().getField().getCell(pos);
 
                 drawCell(cell, start, g);
             }
-        }
     }
 
     /**
@@ -125,13 +109,20 @@ public class FieldPanel extends JPanel {
     }
 
 
+    public void redraw() {
+        Graphics g = this.getGraphics();
+
+        redrawCells(MinerFrame.getGame().getField().cellsForRedraw, g);
+
+        MinerFrame.getGame().getField().cellsForRedraw = new LinkedList<Position>();
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (MinerFrame.firstStep) {
-            drawClosedField(g);
-            return;
-        }
-        drawField(MinerFrame.getGame().getField(), g);
+        redrawCells(MinerFrame.getGame().getField().cellsForRedraw, g);
+
+        //убираются перерисованные клетки из массива
+        MinerFrame.getGame().getField().cellsForRedraw = new LinkedList<Position>();
     }
 }

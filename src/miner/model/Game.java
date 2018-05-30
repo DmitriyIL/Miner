@@ -4,6 +4,8 @@ package miner.model;
 import miner.MinerFrame;
 
 import java.awt.Point;
+import java.util.LinkedList;
+
 
 /**
  * Класс отвечает за игровой процесс, состояние игры,
@@ -14,12 +16,14 @@ public class Game {
 
     private Field field;
 
-    public static final int loseGameState = 1;
-    public static final int actionGameState = 2;
-    public static final int winGameState = 3;
+    public enum GameStatus {
+        ACTION,
+        LOSE,
+        WIN
+    }
 
-    private int gameState;
-    private int colsAmt, rowsAmt, minesAmt;
+    private GameStatus gameState;
+    private int colsAmt, rowsAmt;
 
     /**
      * Конструктор игрового процесса
@@ -30,10 +34,10 @@ public class Game {
     public Game(int colsAmt, int rowsAmt, int minesAmt) {
         this.colsAmt = colsAmt;
         this.rowsAmt = rowsAmt;
-        this.minesAmt = minesAmt;
 
-        gameState = actionGameState;
+        gameState = GameStatus.ACTION;
 
+        field = new Field(colsAmt, rowsAmt, minesAmt);
     }
 
 
@@ -48,7 +52,7 @@ public class Game {
     /**
      * @return состояние игры.
      */
-    public int getGameState() {
+    public GameStatus getGameState() {
         return gameState;
     }
 
@@ -59,34 +63,39 @@ public class Game {
      * @param y - координата нажатия.
      */
     public void pressLeftButton(int x, int y) {
-        if (gameState != actionGameState) return;
+        if (gameState != GameStatus.ACTION) return;
 
         Position pressedPos = fieldPointToFieldCell(x, y, MinerFrame.pixWidth, MinerFrame.pixHeight);
 
-        if (MinerFrame.firstStep) {
-            if (!cellExist(pressedPos)) return;
-            field = new Field(colsAmt, rowsAmt, minesAmt, pressedPos);
-            MinerFrame.firstStep = false;
-        }
-
-        if (!cellExist(pressedPos)) return;
+        if (!Field.cellExist(pressedPos, colsAmt, rowsAmt)) return;
 
         Cell pressedCell = field.getCell(pressedPos);
 
+        if (MinerFrame.firstStep && !pressedCell.isFlaged()) {
+            field.createBombs(pressedPos);
+            MinerFrame.firstStep = false;
+        }
+
         if (pressedCell.isMined()) {
             pressedCell.setState(Cell.blastedCell);
-            gameState = loseGameState;
+            gameState = GameStatus.LOSE;
+
+            redrawAllCells();
+
             return;
         }
 
         field.openCell(pressedPos);
 
-        if (field.checkWin()) gameState = winGameState;
+        if (field.checkWin()) gameState = GameStatus.WIN;
     }
 
-
-    private boolean cellExist(Position cellPos) {
-        return cellPos.col >= 0 && cellPos.col < colsAmt && cellPos.row >= 0 && cellPos.row < rowsAmt;
+    private void redrawAllCells() {
+        for (int rowPos = 0; rowPos < rowsAmt; rowPos++){
+            for (int colPos = 0; colPos < colsAmt; colPos++) {
+                field.cellsForRedraw.add(new Position(colPos, rowPos));
+            }
+        }
     }
 
 
@@ -96,16 +105,15 @@ public class Game {
      * @param y - координата нажатия.
      */
     public void pressRightButton(int x, int y) {
-        if (gameState != actionGameState) return;
+        if (gameState != GameStatus.ACTION) return;
 
         Position pressedPos = fieldPointToFieldCell(x, y, MinerFrame.pixWidth, MinerFrame.pixHeight);
 
-
-        if (!cellExist(pressedPos)) return;
+        if (!Field.cellExist(pressedPos, colsAmt, rowsAmt)) return;
 
         field.markCell(pressedPos);
 
-        if (field.checkWin()) gameState = winGameState;
+        if (field.checkWin()) gameState = GameStatus.WIN;
     }
 
 
@@ -175,6 +183,6 @@ public class Game {
      * Проверяет окончена ли игра.
      */
     public boolean checkEndGame() {
-        return gameState != actionGameState;
+        return gameState != GameStatus.ACTION;
     }
 }

@@ -38,7 +38,7 @@ public class MinerFrame extends JFrame {
      * Запускает приложение
      */
     public static void main(String[] args) {
-        new MinerFrame();
+        SwingUtilities.invokeLater(MinerFrame::new);
     }
 
 
@@ -185,7 +185,7 @@ public class MinerFrame extends JFrame {
 
         game = new Game(toInt(fieldWidth), toInt(fieldHeight), toInt(bombsAmt));
 
-        fieldPanel.repaint();
+        fieldPanel.redraw();
         statusLabel.setText("Найдите все бомбы");
     }
 
@@ -201,7 +201,6 @@ public class MinerFrame extends JFrame {
         this.remove(statusLabel);
 
         initMenu();
-        add(menuPanel);
 
         validateFrame();
     }
@@ -217,11 +216,10 @@ public class MinerFrame extends JFrame {
         if (e.getButton() == MouseEvent.BUTTON1)
             game.pressLeftButton(x, y);
         if (e.getButton() == MouseEvent.BUTTON3) {
-            if (firstStep) dialog = new DialogFrame("Ошибка", "Первый ход - всегда открытие клетки", this);
-            else game.pressRightButton(x, y);
+            game.pressRightButton(x, y);
         }
 
-        fieldPanel.repaint();
+        fieldPanel.redraw();
 
         checkGameStatus();
     }
@@ -232,11 +230,11 @@ public class MinerFrame extends JFrame {
      */
     private void checkGameStatus() {
         switch (game.getGameState()) {
-            case 1:
+            case LOSE:
                 statusLabel.setText("Вы прогиграли");
                 dialog = new DialogFrame("Поражение", "Упс.. Кажется вы взорвались.", this);
                 return;
-            case 3:
+            case WIN:
                 statusLabel.setText("Вы победили");
                 dialog = new DialogFrame("Победа", "Поле отчищено от бомб!", this);
                 return;

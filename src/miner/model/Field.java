@@ -11,11 +11,13 @@ import java.util.Random;
  */
 public class Field {
 
-    private int cols, rows, mines, flags;
+    public static int cols, rows;
+    private int mines, flags;
     private Cell[][] cellsMatrix;
     private int restCells;
 
-    private Position pressedPos;
+    public LinkedList<Position> cellsForRedraw;
+
 
     /**
      * Конструктор создает поле с рандомным расположением бомб.
@@ -23,24 +25,17 @@ public class Field {
      * @param rowsAmt - кол-во рядов на поле.
      * @param minesAmt - кол-во мин на поле.
      */
-    public Field(int colsAmt, int rowsAmt, int minesAmt, Position pressedPos) {
-        this.cols = colsAmt;
-        this.rows = rowsAmt;
+    public Field(int colsAmt, int rowsAmt, int minesAmt) {
+        cols = colsAmt;
+        rows = rowsAmt;
         this.mines = minesAmt;
-        this.pressedPos = pressedPos;
+        cellsForRedraw = new LinkedList<>();
 
         flags = 0;
         restCells = (colsAmt * rowsAmt) - minesAmt;
         createField();
     }
 
-
-    /**
-     * @return класс Cell по двум координатам.
-     */
-    public Cell getCell(int col, int row) {
-        return cellsMatrix[col][row];
-    }
 
 
     /**
@@ -76,23 +71,36 @@ public class Field {
     private void createField() {
         cellsMatrix = new Cell[cols][rows];
 
+        for (int rowPos = 0; rowPos < rows; rowPos++){
+            for (int colPos = 0; colPos < cols; colPos++) {
+                cellsMatrix[colPos][rowPos] = new Cell(Cell.closedCell);
+
+                cellsForRedraw.add(new Position(colPos, rowPos));
+            }
+        }
+    }
+
+
+    public void createBombs(Position pressedPos) {
         Random rand = new Random();
-        byte mined = (byte) (Cell.closedCell + Cell.minedCell);
         List<Position> restPositions = new LinkedList<>();
 
         for (int rowPos = 0; rowPos < rows; rowPos++){
             for (int colPos = 0; colPos < cols; colPos++) {
-                if (pressedPos.row == rowPos && pressedPos.col == colPos) continue;
-
                 restPositions.add(new Position(colPos, rowPos));
             }
         }
+
+        restPositions.remove(pressedPos.row * cols + pressedPos.col);
 
         // set mines
         for (int countMines = 0; countMines < mines; countMines++) {
             int index = rand.nextInt(restPositions.size());
             Position cellPos = restPositions.get(index);
-            cellsMatrix[cellPos.col][cellPos.row] = new Cell(mined);
+
+            Cell cell = cellsMatrix[cellPos.col][cellPos.row];
+            cell.setState(cell.getState() + Cell.minedCell);
+
             restPositions.remove(index);
         }
 
@@ -100,7 +108,8 @@ public class Field {
         restPositions.add(pressedPos);
         for (Position cellPos : restPositions) {
             byte minesAround = countMinesAroundCell(cellPos);
-            cellsMatrix[cellPos.col][cellPos.row] = new Cell(Cell.closedCell + minesAround);
+            Cell cell = cellsMatrix[cellPos.col][cellPos.row];
+            cell.setState(cell.getState() + minesAround);
         }
     }
 
@@ -114,7 +123,7 @@ public class Field {
         Position[] positionsAround = getPositionsAround(cellPos);
 
         for (Position posAround : positionsAround) {
-            if (cellExist(posAround)
+            if (cellExist(posAround, cols, rows)
                     && cellsMatrix[posAround.col][posAround.row] != null
                     && cellsMatrix[posAround.col][posAround.row].isMined())
                 result++;
@@ -128,8 +137,9 @@ public class Field {
      * Проверка на существование клетки на позиции cellPos.
      * @param cellPos - позиция клетки
      */
-    private boolean cellExist(Position cellPos) {
-        return cellPos.col >= 0 && cellPos.col < cols && cellPos.row >= 0 && cellPos.row < rows;
+    public static boolean cellExist(Position cellPos, int colsAmt, int rowsAmt) {
+        return cellPos.col >= 0 && cellPos.col < colsAmt &&
+               cellPos.row >= 0 && cellPos.row < rowsAmt;
     }
 
 
@@ -170,8 +180,8 @@ public class Field {
      * то рекурсией открываются соседние.
      * @param cellPos - позиция клетки
      */
-    void openCell(Position cellPos) {
-        if (!cellExist(cellPos)) return;
+    public void openCell(Position cellPos) {
+        if (!cellExist(cellPos, cols, rows)) return;
 
         Cell cell = getCell(cellPos);
 
@@ -183,6 +193,8 @@ public class Field {
             cell.setState(cell.getState() - Cell.closedCell);
 
         restCells--;
+
+        cellsForRedraw.add(cellPos);
 
         if (!cell.isEmpty()) return;
 
@@ -198,8 +210,8 @@ public class Field {
      * Помечает клетку флагом или вопросиком.
      * @param cellPos - позиция клетки
      */
-    void markCell(Position cellPos) {
-        if (!cellExist(cellPos)) return;
+    public void markCell(Position cellPos) {
+        if (!cellExist(cellPos, cols, rows)) return;
 
         Cell cell = getCell(cellPos);
 
@@ -212,13 +224,15 @@ public class Field {
             cell.setState(cell.getState() + 20); // to closed flaged cell
             flags++;
         }
+
+        cellsForRedraw.add(cellPos);
     }
 
 
     /**
      * Проверяет достигнуты ли условия для победы.
      */
-    boolean checkWin() {
+    public boolean checkWin() {
         return restCells == 0 && flags == mines;
     }
 }

@@ -69,7 +69,7 @@ public class MenuPanel extends JPanel {
         container.add(bombsAmt);
         container.add(startGameButton);
 
-        this.add(container);
+        this.add(container, BorderLayout.CENTER);
     }
 
 
