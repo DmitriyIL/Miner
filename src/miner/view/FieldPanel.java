@@ -17,19 +17,22 @@ import java.util.LinkedList;
 public class FieldPanel extends JPanel {
 
     private int pixWidth, pixHeight;
-
-
+    private int cols, rows;
     /**
      * Создает экземпляр класса.
      * Устанавливает размер поля и инициализирует слушателей.
-     * @param cols - кол-во столбцов поля.
-     * @param rows - кол-во рядов поля.
-     * @param pixWidth - ширина одно шестиугольника в пикселях.
+     *
+     * @param cols      - кол-во столбцов поля.
+     * @param rows      - кол-во рядов поля.
+     * @param pixWidth  - ширина одно шестиугольника в пикселях.
      * @param pixHeight - длина одно шестиугольника в пикселях.
      */
     public FieldPanel(int cols, int rows, int pixWidth, int pixHeight) {
         this.pixHeight = pixHeight;
         this.pixWidth = pixWidth;
+        this.cols = cols;
+        this.rows = rows;
+
 
         this.setPreferredSize(new Dimension(cols * pixWidth + (int) ((rows == 1) ? 0 : 0.5 * pixWidth),
                 (int) (rows * pixHeight * 0.75) + (int) (pixHeight * 0.25)));
@@ -38,23 +41,25 @@ public class FieldPanel extends JPanel {
 
     /**
      * Рисует поле игры в панели.
-     * @param cellsForRedraw - класс модели поля, хранящий всю информацию о состоянии поля.
+     *
+     * @param field - класс модели поля, хранящий всю информацию о состоянии поля.
      */
-    private void redrawCells(LinkedList<Position> cellsForRedraw, Graphics g) {
-        for (Position pos: cellsForRedraw) {
-                int startX = pos.col * pixWidth + ((pos.row % 2 == 1) ? (int) (0.5 * pixWidth) : 0);
-                int startY = pos.row * (int) (pixHeight * 0.75);
+    private void drawField(Field field, Graphics g) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                int startX = j * pixWidth + ((i % 2 == 1) ? (int) (0.5 * pixWidth) : 0);
+                int startY = i * (int) (pixHeight * 0.75);
                 Point start = new Point(startX, startY);
-
-                Cell cell = MinerFrame.getGame().getField().getCell(pos);
-
+                Cell cell = field.getCell(j, i);
                 drawCell(cell, start, g);
             }
+        }
     }
 
     /**
      * Рисует одну ячейку поля.
-     * @param cell - класс Cell, хранящий состояние ячейки, которое надо отобразить.
+     *
+     * @param cell  - класс Cell, хранящий состояние ячейки, которое надо отобразить.
      * @param start - класс Point, хранящий координаты начала отрисовки.
      */
     private void drawCell(Cell cell, Point start, Graphics g) {
@@ -88,6 +93,7 @@ public class FieldPanel extends JPanel {
 
     /**
      * Рисует изображение из карты res/img/map_98x112 по индексу.
+     *
      * @param imgId - индекс изображения в карте.
      * @param start - класс Point, хранящий координаты начала отрисовки.
      */
@@ -100,6 +106,7 @@ public class FieldPanel extends JPanel {
 
     /**
      * Получчает изображение из res/img/ по имени.
+     *
      * @param name - имя изображения.
      */
     public static Image getImage(String name) {
@@ -109,20 +116,9 @@ public class FieldPanel extends JPanel {
     }
 
 
-    public void redraw() {
-        Graphics g = this.getGraphics();
-
-        redrawCells(MinerFrame.getGame().getField().cellsForRedraw, g);
-
-        MinerFrame.getGame().getField().cellsForRedraw = new LinkedList<Position>();
-    }
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        redrawCells(MinerFrame.getGame().getField().cellsForRedraw, g);
-
-        //убираются перерисованные клетки из массива
-        MinerFrame.getGame().getField().cellsForRedraw = new LinkedList<Position>();
+        drawField(MinerFrame.getGame().getField(), g);
     }
 }

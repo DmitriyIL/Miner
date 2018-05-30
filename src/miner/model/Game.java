@@ -79,9 +79,6 @@ public class Game {
         if (pressedCell.isMined()) {
             pressedCell.setState(Cell.blastedCell);
             gameState = GameStatus.LOSE;
-
-            redrawAllCells();
-
             return;
         }
 
@@ -90,13 +87,6 @@ public class Game {
         if (field.checkWin()) gameState = GameStatus.WIN;
     }
 
-    private void redrawAllCells() {
-        for (int rowPos = 0; rowPos < rowsAmt; rowPos++){
-            for (int colPos = 0; colPos < colsAmt; colPos++) {
-                field.cellsForRedraw.add(new Position(colPos, rowPos));
-            }
-        }
-    }
 
 
     /**

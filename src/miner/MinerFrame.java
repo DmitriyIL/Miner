@@ -185,7 +185,7 @@ public class MinerFrame extends JFrame {
 
         game = new Game(toInt(fieldWidth), toInt(fieldHeight), toInt(bombsAmt));
 
-        fieldPanel.redraw();
+        fieldPanel.repaint();
         statusLabel.setText("Найдите все бомбы");
     }
 
@@ -219,7 +219,7 @@ public class MinerFrame extends JFrame {
             game.pressRightButton(x, y);
         }
 
-        fieldPanel.redraw();
+        fieldPanel.repaint();
 
         checkGameStatus();
     }

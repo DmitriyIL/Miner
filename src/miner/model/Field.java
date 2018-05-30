@@ -16,26 +16,31 @@ public class Field {
     private Cell[][] cellsMatrix;
     private int restCells;
 
-    public LinkedList<Position> cellsForRedraw;
-
 
     /**
      * Конструктор создает поле с рандомным расположением бомб.
-     * @param colsAmt - кол-во столбцов на поле.
-     * @param rowsAmt - кол-во рядов на поле.
+     *
+     * @param colsAmt  - кол-во столбцов на поле.
+     * @param rowsAmt  - кол-во рядов на поле.
      * @param minesAmt - кол-во мин на поле.
      */
     public Field(int colsAmt, int rowsAmt, int minesAmt) {
         cols = colsAmt;
         rows = rowsAmt;
         this.mines = minesAmt;
-        cellsForRedraw = new LinkedList<>();
 
         flags = 0;
         restCells = (colsAmt * rowsAmt) - minesAmt;
         createField();
     }
 
+
+    /**
+     * @return класс Cell по двум координатам.
+     */
+    public Cell getCell(int col, int row) {
+        return cellsMatrix[col][row];
+    }
 
 
     /**
@@ -56,26 +61,24 @@ public class Field {
 
     /**
      * Создает поле с рандомным расположением мин.
-     *
+     * <p>
      * Алгоритм:
-     *
+     * <p>
      * Создается масссив из всех позиций restPosition.
-     *
+     * <p>
      * Далее выбирает cлучайная позиция из restPosition,
      * в нее устанавливаетсся мина,
      * потом эта позиция удаляется из restPosition,
      * это повторяется пока не буде полученно нужное кол-во бомб.
-     *
+     * <p>
      * Далее для всех позиций в restPosition считается кол-во бомб вокруг.
      */
     private void createField() {
         cellsMatrix = new Cell[cols][rows];
 
-        for (int rowPos = 0; rowPos < rows; rowPos++){
+        for (int rowPos = 0; rowPos < rows; rowPos++) {
             for (int colPos = 0; colPos < cols; colPos++) {
                 cellsMatrix[colPos][rowPos] = new Cell(Cell.closedCell);
-
-                cellsForRedraw.add(new Position(colPos, rowPos));
             }
         }
     }
@@ -85,7 +88,7 @@ public class Field {
         Random rand = new Random();
         List<Position> restPositions = new LinkedList<>();
 
-        for (int rowPos = 0; rowPos < rows; rowPos++){
+        for (int rowPos = 0; rowPos < rows; rowPos++) {
             for (int colPos = 0; colPos < cols; colPos++) {
                 restPositions.add(new Position(colPos, rowPos));
             }
@@ -116,6 +119,7 @@ public class Field {
 
     /**
      * Считает кол-во бомб вокруг клетки
+     *
      * @param cellPos - позиция клетки
      */
     public byte countMinesAroundCell(Position cellPos) {
@@ -135,11 +139,12 @@ public class Field {
 
     /**
      * Проверка на существование клетки на позиции cellPos.
+     *
      * @param cellPos - позиция клетки
      */
     public static boolean cellExist(Position cellPos, int colsAmt, int rowsAmt) {
         return cellPos.col >= 0 && cellPos.col < colsAmt &&
-               cellPos.row >= 0 && cellPos.row < rowsAmt;
+                cellPos.row >= 0 && cellPos.row < rowsAmt;
     }
 
 
@@ -147,6 +152,7 @@ public class Field {
      * Получает массив позиций вокруг позиции cellPos,
      * при этом несуществующие позиции не отсеиваются,
      * они отсеиваются в countMinesAroundCell().
+     *
      * @param cellPos - позиция клетки
      */
     private Position[] getPositionsAround(Position cellPos) {
@@ -178,6 +184,7 @@ public class Field {
     /**
      * Открывает клетку, при этом, если клетка пустая,
      * то рекурсией открываются соседние.
+     *
      * @param cellPos - позиция клетки
      */
     public void openCell(Position cellPos) {
@@ -194,8 +201,6 @@ public class Field {
 
         restCells--;
 
-        cellsForRedraw.add(cellPos);
-
         if (!cell.isEmpty()) return;
 
         Position[] cellsArround = getPositionsAround(cellPos);
@@ -208,6 +213,7 @@ public class Field {
 
     /**
      * Помечает клетку флагом или вопросиком.
+     *
      * @param cellPos - позиция клетки
      */
     public void markCell(Position cellPos) {
@@ -225,7 +231,6 @@ public class Field {
             flags++;
         }
 
-        cellsForRedraw.add(cellPos);
     }
 
 
