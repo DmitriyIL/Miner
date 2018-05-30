@@ -37,6 +37,19 @@ public class FieldPanel extends JPanel {
     }
 
 
+    private void drawClosedField(Graphics g) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                int startX = j * pixWidth + ((i % 2 == 1) ? (int) (0.5 * pixWidth) : 0);
+                int startY = i * (int) (pixHeight * 0.75);
+                Point start = new Point(startX, startY);
+
+                drawImg(g, 13, start); //13 - закрытая клетка
+            }
+        }
+    }
+
+
     /**
      * Рисует поле игры в панели.
      * @param field - класс модели поля, хранящий всю информацию о состоянии поля.
@@ -115,6 +128,10 @@ public class FieldPanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        if (MinerFrame.firstStep) {
+            drawClosedField(g);
+            return;
+        }
         drawField(MinerFrame.getGame().getField(), g);
     }
 }

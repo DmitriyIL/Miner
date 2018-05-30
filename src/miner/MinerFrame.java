@@ -33,6 +33,7 @@ public class MinerFrame extends JFrame {
     public static final int pixWidth = 48; // width in pixels
     public static final int pixHeight = 56; // height in pixels
 
+    public static boolean firstStep = true;
     /**
      * Запускает приложение
      */
@@ -176,6 +177,8 @@ public class MinerFrame extends JFrame {
      * Создает новую игру
      */
     public void restartGame() {
+        firstStep = true;
+
         String fieldWidth = menuPanel.getColsAmt();
         String fieldHeight = menuPanel.getRowsAmt();
         String bombsAmt = menuPanel.getBombsAmt();
@@ -191,6 +194,8 @@ public class MinerFrame extends JFrame {
      * Возвращает игрока в Меню настроек игры.
      */
     private void openMenu() {
+        firstStep = true;
+
         this.remove(fieldPanel);
         this.remove(toolbar);
         this.remove(statusLabel);
@@ -211,8 +216,10 @@ public class MinerFrame extends JFrame {
 
         if (e.getButton() == MouseEvent.BUTTON1)
             game.pressLeftButton(x, y);
-        if (e.getButton() == MouseEvent.BUTTON3)
-            game.pressRightButton(x, y);
+        if (e.getButton() == MouseEvent.BUTTON3) {
+            if (firstStep) dialog = new DialogFrame("Ошибка", "Первый ход - всегда открытие клетки", this);
+            else game.pressRightButton(x, y);
+        }
 
         fieldPanel.repaint();
 

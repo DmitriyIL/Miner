@@ -19,7 +19,7 @@ public class Game {
     public static final int winGameState = 3;
 
     private int gameState;
-    private int colsAmt, rowsAmt;
+    private int colsAmt, rowsAmt, minesAmt;
 
     /**
      * Конструктор игрового процесса
@@ -30,9 +30,10 @@ public class Game {
     public Game(int colsAmt, int rowsAmt, int minesAmt) {
         this.colsAmt = colsAmt;
         this.rowsAmt = rowsAmt;
+        this.minesAmt = minesAmt;
 
         gameState = actionGameState;
-        field = new Field(colsAmt, rowsAmt, minesAmt);
+
     }
 
 
@@ -62,8 +63,13 @@ public class Game {
 
         Position pressedPos = fieldPointToFieldCell(x, y, MinerFrame.pixWidth, MinerFrame.pixHeight);
 
-        if (pressedPos.col < 0 || pressedPos.col >= colsAmt) return;
-        if (pressedPos.row < 0 || pressedPos.row >= rowsAmt) return;
+        if (MinerFrame.firstStep) {
+            if (!cellExist(pressedPos)) return;
+            field = new Field(colsAmt, rowsAmt, minesAmt, pressedPos);
+            MinerFrame.firstStep = false;
+        }
+
+        if (!cellExist(pressedPos)) return;
 
         Cell pressedCell = field.getCell(pressedPos);
 
@@ -79,6 +85,11 @@ public class Game {
     }
 
 
+    private boolean cellExist(Position cellPos) {
+        return cellPos.col >= 0 && cellPos.col < colsAmt && cellPos.row >= 0 && cellPos.row < rowsAmt;
+    }
+
+
     /**
      * Обрабатывает нажатие на поле правой кнопкой мыши.
      * @param x - координата нажатия.
@@ -89,8 +100,11 @@ public class Game {
 
         Position pressedPos = fieldPointToFieldCell(x, y, MinerFrame.pixWidth, MinerFrame.pixHeight);
 
-        if (pressedPos.col < 0 || pressedPos.col >= colsAmt) return;
-        if (pressedPos.row < 0 || pressedPos.row >= rowsAmt) return;
+        if (MinerFrame.firstStep) {
+
+        }
+
+        if (!cellExist(pressedPos)) return;
 
         field.markCell(pressedPos);
 

@@ -15,6 +15,7 @@ public class Field {
     private Cell[][] cellsMatrix;
     private int restCells;
 
+    private Position pressedPos;
 
     /**
      * Конструктор создает поле с рандомным расположением бомб.
@@ -22,10 +23,11 @@ public class Field {
      * @param rowsAmt - кол-во рядов на поле.
      * @param minesAmt - кол-во мин на поле.
      */
-    public Field(int colsAmt, int rowsAmt, int minesAmt) {
+    public Field(int colsAmt, int rowsAmt, int minesAmt, Position pressedPos) {
         this.cols = colsAmt;
         this.rows = rowsAmt;
         this.mines = minesAmt;
+        this.pressedPos = pressedPos;
 
         flags = 0;
         restCells = (colsAmt * rowsAmt) - minesAmt;
@@ -78,9 +80,13 @@ public class Field {
         byte mined = (byte) (Cell.closedCell + Cell.minedCell);
         List<Position> restPositions = new LinkedList<>();
 
-        for (int rowPos = 0; rowPos < rows; rowPos++)
-            for (int colPos = 0; colPos < cols; colPos++)
+        for (int rowPos = 0; rowPos < rows; rowPos++){
+            for (int colPos = 0; colPos < cols; colPos++) {
+                if (pressedPos.row == rowPos && pressedPos.col == colPos) continue;
+
                 restPositions.add(new Position(colPos, rowPos));
+            }
+        }
 
         // set mines
         for (int countMines = 0; countMines < mines; countMines++) {
@@ -91,6 +97,7 @@ public class Field {
         }
 
         // set other cells
+        restPositions.add(pressedPos);
         for (Position cellPos : restPositions) {
             byte minesAround = countMinesAroundCell(cellPos);
             cellsMatrix[cellPos.col][cellPos.row] = new Cell(Cell.closedCell + minesAround);

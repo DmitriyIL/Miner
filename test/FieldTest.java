@@ -29,6 +29,20 @@ public class FieldTest {
 
 
     @Test
+    public void firstStepTest() {
+        Game game = new Game(35, 20, 35 * 20 - 1);
+        Point p = game.findCellCenter(0, 0);
+        game.pressLeftButton(p.x, p.y);
+
+        assertEquals(Game.actionGameState, game.getGameState());
+
+        Field field = game.getField();
+        Cell[][] cellsMatr = field.getCellsMatrix();
+        assertTrue(cellsMatr[0][0].isOpened());
+    }
+
+
+    @Test
     public void bombTest() {
         Game game = new Game(20, 15, 40);
         Field field = game.getField();
