@@ -100,9 +100,6 @@ public class Game {
 
         Position pressedPos = fieldPointToFieldCell(x, y, MinerFrame.pixWidth, MinerFrame.pixHeight);
 
-        if (MinerFrame.firstStep) {
-
-        }
 
         if (!cellExist(pressedPos)) return;
 
