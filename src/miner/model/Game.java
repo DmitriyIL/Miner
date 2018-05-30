@@ -5,6 +5,11 @@ import miner.MinerFrame;
 
 import java.awt.Point;
 
+/**
+ * Класс отвечает за игровой процесс, состояние игры,
+ * также отвечает за обработка нажатий.
+ * Соединяет MinerFrame и Field.
+ */
 public class Game {
 
     private Field field;
@@ -14,37 +19,51 @@ public class Game {
     public static final int winGameState = 3;
 
     private int gameState;
-    private int width, height;
+    private int colsAmt, rowsAmt;
 
-
-    public Game(int width, int height, int mines) {
-        this.width = width;
-        this.height = height;
+    /**
+     * Конструктор игрового процесса
+     * @param colsAmt - кол-во столбцов на поле.
+     * @param rowsAmt - кол-во рядов на поле.
+     * @param minesAmt - кол-во мин на поле.
+     */
+    public Game(int colsAmt, int rowsAmt, int minesAmt) {
+        this.colsAmt = colsAmt;
+        this.rowsAmt = rowsAmt;
 
         gameState = actionGameState;
-        field = new Field(width, height, mines);
+        field = new Field(colsAmt, rowsAmt, minesAmt);
     }
 
+
+    /**
+     * @return класс field.
+     */
     public Field getField() {
         return field;
     }
 
+
+    /**
+     * @return состояние игры.
+     */
     public int getGameState() {
         return gameState;
     }
 
-    public boolean checkEndGame() {
-        return gameState != actionGameState;
-    }
 
-
+    /**
+     * Обрабатывает нажатие на поле левой кнопкой мыши.
+     * @param x - координата нажатия.
+     * @param y - координата нажатия.
+     */
     public void pressLeftButton(int x, int y) {
         if (gameState != actionGameState) return;
 
         Position pressedPos = fieldPointToFieldCell(x, y, MinerFrame.pixWidth, MinerFrame.pixHeight);
 
-        if (pressedPos.col < 0 || pressedPos.col >= width) return;
-        if (pressedPos.row < 0 || pressedPos.row >= height) return;
+        if (pressedPos.col < 0 || pressedPos.col >= colsAmt) return;
+        if (pressedPos.row < 0 || pressedPos.row >= rowsAmt) return;
 
         Cell pressedCell = field.getCell(pressedPos);
 
@@ -60,13 +79,18 @@ public class Game {
     }
 
 
+    /**
+     * Обрабатывает нажатие на поле правой кнопкой мыши.
+     * @param x - координата нажатия.
+     * @param y - координата нажатия.
+     */
     public void pressRightButton(int x, int y) {
         if (gameState != actionGameState) return;
 
         Position pressedPos = fieldPointToFieldCell(x, y, MinerFrame.pixWidth, MinerFrame.pixHeight);
 
-        if (pressedPos.col < 0 || pressedPos.col >= width) return;
-        if (pressedPos.row < 0 || pressedPos.row >= height) return;
+        if (pressedPos.col < 0 || pressedPos.col >= colsAmt) return;
+        if (pressedPos.row < 0 || pressedPos.row >= rowsAmt) return;
 
         field.markCell(pressedPos);
 
@@ -74,6 +98,20 @@ public class Game {
     }
 
 
+    /**
+     * Высчитывает позицию клетки, на которую нажали мышкой.
+     *
+     * Алгоритм:
+     * Находит предполагаемые клетки на которые нажали,
+     * потом путем перебора ищет минимальное расстояние
+     * от точки нажатия до центра клеток.
+     *
+     * @param x - координата нажатия мышкой.
+     * @param y - координата нажатия мышкой.
+     * @param CellWidth - ширина одного шестиугольника в пикселях.
+     * @param CellHeight - высота одного шестиугольника в пикселях.
+     * @return поцицию клетки на которую нажали
+     */
     private Position fieldPointToFieldCell(int x, int y, int CellWidth, int CellHeight) {
 
         float height25 = CellHeight * 0.25f; //высота пустого треугольника вверху и внизу поля
@@ -86,6 +124,7 @@ public class Game {
         int colInEvenRow = (int) Math.floor(x / CellWidth);  //на одном X могут лежать 2 колонны
         int colInOddRow = (int) Math.floor((x - width50) / CellWidth);
 
+        //поиск клетки с ближайшим центром
         Point pressPoint = new Point(x, y);
         int minDistanceToPressPoint = Integer.MAX_VALUE;
         Position pressedCellPos = new Position(-1, -1);
@@ -104,6 +143,12 @@ public class Game {
     }
 
 
+    /**
+     * Ищет центр клетки.
+     * @param col - столбец в котором расположена клетка.
+     * @param row - ряд в котором расположена клетка.
+     * @return класс Point, хранящий координаты центра.
+     */
     public Point findCellCenter(int col, int row) {
         int cellWidth = MinerFrame.pixWidth;
         int cellHeight = MinerFrame.pixHeight;
@@ -114,4 +159,11 @@ public class Game {
         return new Point(centerX, centerY);
     }
 
+
+    /**
+     * Проверяет окончена ли игра.
+     */
+    public boolean checkEndGame() {
+        return gameState != actionGameState;
+    }
 }

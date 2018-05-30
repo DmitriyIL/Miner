@@ -5,12 +5,21 @@ import miner.MinerFrame;
 import javax.swing.*;
 import java.awt.*;
 
-public class Dialog extends JDialog {
+/**
+ * отвечает за диалоги
+ */
+class Dialog extends JDialog {
 
-    public Dialog(JFrame owner, String dialogName, String textError, MinerFrame parentFrame) {
+    /**
+     * Инициализирует диалог
+     * @param owner - класс DialogFrame, который вызвал диалог
+     * @param dialogName - название окна
+     * @param textDialog - - текст в окне диалога
+     */
+    public Dialog(JFrame owner, String dialogName, String textDialog, MinerFrame minerFrame) {
         super(owner, dialogName, true);
 
-        add(new JLabel(textError), BorderLayout.CENTER);
+        add(new JLabel(textDialog), BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
 
@@ -21,7 +30,7 @@ public class Dialog extends JDialog {
         if (!dialogName.equals("Ошибка")) {
             JButton restart = new JButton("New Game");
             restart.addActionListener(event -> {
-                parentFrame.restartGame();
+                minerFrame.restartGame();
                 setVisible(false);
             });
             panel.add(restart);

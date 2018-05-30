@@ -4,28 +4,24 @@ import miner.MinerFrame;
 
 import javax.swing.*;
 
+/**
+ * Отвечает за фрейм диалога
+ */
 public class DialogFrame extends JFrame {
 
     private static final int DEFAULT_WIDTH = 300;
     private static final int DEFAULT_HEIGHT = 200;
 
-    private Dialog dialog;
-
-    public DialogFrame(String dialogName, String text, MinerFrame parentFrame) {
-
+    /**
+     * Coздает диалоговое окно
+     * @param dialogName - название окна
+     * @param text - текст в окне
+     */
+    public DialogFrame(String dialogName, String text, MinerFrame minerFrame) {
         setTitle(dialogName);
         setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
-        JMenuBar menuBar = new JMenuBar();
-        setJMenuBar(menuBar);
-        JMenu fileMenu = new JMenu("File");
-        menuBar.add(fileMenu);
-
-        dialog = new Dialog(DialogFrame.this, dialogName, text, parentFrame);
-        dialog.setVisible(true); // отобразить диалог
-
-        JMenuItem exitItem = new JMenuItem("Exit");
-        exitItem.addActionListener(event -> System.exit(0));
-        fileMenu.add(exitItem);
+        Dialog dialog = new Dialog(DialogFrame.this, dialogName, text, minerFrame);
+        dialog.setVisible(true);
     }
 }

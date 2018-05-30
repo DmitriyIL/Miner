@@ -3,24 +3,30 @@ package miner.view;
 import miner.MinerFrame;
 import miner.model.Cell;
 import miner.model.Field;
-import miner.model.Game;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
+
+/**
+ * Класс отвечает за прорисовку поля и
+ * обработку нажатие на поле.
+ */
 public class FieldPanel extends JPanel {
 
     private int cols, rows;
     private int pixWidth, pixHeight;
 
-    private MinerFrame ownerFrame;
-    private DialogFrame dialog;
 
-    public FieldPanel(int cols, int rows, int pixWidth, int pixHeight, MinerFrame ownerFrame) {
-        this.ownerFrame = ownerFrame;
+    /**
+     * Создает экземпляр класса.
+     * Устанавливает размер поля и инициализирует слушателей.
+     * @param cols - кол-во столбцов поля.
+     * @param rows - кол-во рядов поля.
+     * @param pixWidth - ширина одно шестиугольника в пикселях.
+     * @param pixHeight - длина одно шестиугольника в пикселях.
+     */
+    public FieldPanel(int cols, int rows, int pixWidth, int pixHeight) {
         this.cols = cols;
         this.rows = rows;
         this.pixHeight = pixHeight;
@@ -28,10 +34,13 @@ public class FieldPanel extends JPanel {
 
         this.setPreferredSize(new Dimension(cols * pixWidth + (int) ((rows == 1) ? 0 : 0.5 * pixWidth),
                 (int) (rows * pixHeight * 0.75) + (int) (pixHeight * 0.25)));
-
-        initListener();
     }
 
+
+    /**
+     * Рисует поле игры в панели.
+     * @param field - класс модели поля, хранящий всю информацию о состоянии поля.
+     */
     private void drawField(Field field, Graphics g) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -46,90 +55,66 @@ public class FieldPanel extends JPanel {
         }
     }
 
+    /**
+     * Рисует одну ячейку поля.
+     * @param cell - класс Cell, хранящий состояние ячейки, которое надо отобразить.
+     * @param start - класс Point, хранящий координаты начала отрисовки.
+     */
     private void drawCell(Cell cell, Point start, Graphics g) {
-        drawImg(g, 0, start);
+        drawImg(g, 0, start); //0 - пустая клетка
         if (cell.isOpened()) {
             int imgId = cell.getState();
-            drawImg(g, imgId, start);
+            drawImg(g, imgId, start); //цифра на клетке от 1 до 6
             if (cell.isBlasted())
-                drawImg(g, 12, start);
+                drawImg(g, 12, start); //12 - взорванная бомба
         } else if (MinerFrame.getGame().checkEndGame()) {
             if (!cell.isMined() && !cell.isFlaged()) {
-                drawImg(g, 13, start);
+                drawImg(g, 13, start); //13 - закрытая клетка
                 return;
             }
 
-            drawImg(g, 9, start);
+            drawImg(g, 9, start); //9 - невзорванная бомба
 
             if (cell.isMined() && cell.isFlaged())
-                drawImg(g, 10, start);
+                drawImg(g, 10, start); //10 - галочка
             else if (cell.isFlaged())
-                drawImg(g, 11, start);
+                drawImg(g, 11, start); //11 - крестик
         } else {
-            drawImg(g, 13, start);
+            drawImg(g, 13, start); //13 - закрытая клетка
             if (cell.isFlaged())
-                drawImg(g, 14, start);
+                drawImg(g, 14, start); //14 - флаг
             if (cell.isOuestioned())
-                drawImg(g, 15, start);
+                drawImg(g, 15, start); //15 - вопросик
         }
     }
 
 
-    public static Image getImage(String name) {
-        String fileName = "res/img/" + name.toLowerCase() + ".png";
-        ImageIcon icon = new ImageIcon(fileName);
-        return icon.getImage();
-    }
-
+    /**
+     * Рисует изображение из карты res/img/map_98x112 по индексу.
+     * @param imgId - индекс изображения в карте.
+     * @param start - класс Point, хранящий координаты начала отрисовки.
+     */
     private void drawImg(Graphics g, int imgId, Point start) {
         g.drawImage(getImage("map_98x112"),
                 start.x, start.y, start.x + pixWidth, start.y + pixHeight,
                 imgId * 98, 0, (imgId + 1) * 98 - 1, 111, this);
     }
 
+
+    /**
+     * Получчает изображение из res/img/ по имени.
+     * @param name - имя изображения.
+     */
+    public static Image getImage(String name) {
+        String fileName = "res/img/" + name.toLowerCase() + ".png";
+        ImageIcon icon = new ImageIcon(fileName);
+        return icon.getImage();
+    }
+
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         drawField(MinerFrame.getGame().getField(), g);
-    }
-
-
-    private void initListener() {
-        MouseListener mouseListener = new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                onPress(e);
-            }
-        };
-        addMouseListener(mouseListener);
-    }
-
-    private void onPress(MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
-
-        Game game = MinerFrame.getGame();
-
-        if (e.getButton() == MouseEvent.BUTTON1)
-            game.pressLeftButton(x, y);
-        if (e.getButton() == MouseEvent.BUTTON3)
-            game.pressRightButton(x, y);
-
-        this.repaint(); // после каждого действия мыши перерисовываем панель игры
-
-        checkGameStatus();
-    }
-
-    private void checkGameStatus() {
-        switch (MinerFrame.getGame().getGameState()) {
-            case 1:
-                MinerFrame.getStatusLabel().setText("Вы прогиграли");
-                dialog = new DialogFrame("Поражение", "Упс.. Кажется вы взорвались.", ownerFrame);
-                return;
-            case 3:
-                MinerFrame.getStatusLabel().setText("Вы победили");
-                dialog = new DialogFrame("Победа", "Поздравляем вас с победой!", ownerFrame);
-                return;
-        }
     }
 }

@@ -5,45 +5,81 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+
+/**
+ * Класс управляющий состоянием поля
+ */
 public class Field {
 
-    private int width, height, mines, flags;
+    private int cols, rows, mines, flags;
     private Cell[][] cellsMatrix;
     private int restCells;
 
 
-    public Field(int width, int height, int mines) {
-        this.width = width;
-        this.height = height;
-        this.mines = mines;
+    /**
+     * Конструктор создает поле с рандомным расположением бомб.
+     * @param colsAmt - кол-во столбцов на поле.
+     * @param rowsAmt - кол-во рядов на поле.
+     * @param minesAmt - кол-во мин на поле.
+     */
+    public Field(int colsAmt, int rowsAmt, int minesAmt) {
+        this.cols = colsAmt;
+        this.rows = rowsAmt;
+        this.mines = minesAmt;
 
         flags = 0;
-        restCells = (width * height) - mines;
+        restCells = (colsAmt * rowsAmt) - minesAmt;
         createField();
     }
 
 
-    public Cell getCell(int width, int height) {
-        return cellsMatrix[width][height];
+    /**
+     * @return класс Cell по двум координатам.
+     */
+    public Cell getCell(int col, int row) {
+        return cellsMatrix[col][row];
     }
 
+
+    /**
+     * @return класс Cell по классу Position.
+     */
     public Cell getCell(Position pos) {
         return cellsMatrix[pos.col][pos.row];
     }
 
+
+    /**
+     * @return матрицу хранящую состояние поля.
+     */
     public Cell[][] getCellsMatrix() {
         return cellsMatrix;
     }
 
+
+    /**
+     * Создает поле с рандомным расположением мин.
+     *
+     * Алгоритм:
+     *
+     * Создается масссив из всех позиций restPosition.
+     *
+     * Далее выбирает cлучайная позиция из restPosition,
+     * в нее устанавливаетсся мина,
+     * потом эта позиция удаляется из restPosition,
+     * это повторяется пока не буде полученно нужное кол-во бомб.
+     *
+     * Далее для всех позиций в restPosition считается кол-во бомб вокруг.
+     */
     private void createField() {
-        cellsMatrix = new Cell[width][height];
+        cellsMatrix = new Cell[cols][rows];
 
         Random rand = new Random();
         byte mined = (byte) (Cell.closedCell + Cell.minedCell);
         List<Position> restPositions = new LinkedList<>();
 
-        for (int rowPos = 0; rowPos < height; rowPos++)
-            for (int colPos = 0; colPos < width; colPos++)
+        for (int rowPos = 0; rowPos < rows; rowPos++)
+            for (int colPos = 0; colPos < cols; colPos++)
                 restPositions.add(new Position(colPos, rowPos));
 
         // set mines
@@ -62,6 +98,10 @@ public class Field {
     }
 
 
+    /**
+     * Считает кол-во бомб вокруг клетки
+     * @param cellPos - позиция клетки
+     */
     public byte countMinesAroundCell(Position cellPos) {
         byte result = 0;
         Position[] positionsAround = getPositionsAround(cellPos);
@@ -77,16 +117,26 @@ public class Field {
     }
 
 
+    /**
+     * Проверка на существование клетки на позиции cellPos.
+     * @param cellPos - позиция клетки
+     */
     private boolean cellExist(Position cellPos) {
-        return cellPos.col >= 0 && cellPos.col < width && cellPos.row >= 0 && cellPos.row < height;
+        return cellPos.col >= 0 && cellPos.col < cols && cellPos.row >= 0 && cellPos.row < rows;
     }
 
 
+    /**
+     * Получает массив позиций вокруг позиции cellPos,
+     * при этом несуществующие позиции не отсеиваются,
+     * они отсеиваются в countMinesAroundCell().
+     * @param cellPos - позиция клетки
+     */
     private Position[] getPositionsAround(Position cellPos) {
 
         Position positionsAround[];
 
-        // even rows
+        // в случае четного ряда
         if (cellPos.row % 2 == 0) {
             positionsAround = new Position[]{
                     new Position(cellPos.col, cellPos.row - 1), new Position(cellPos.col - 1, cellPos.row - 1),
@@ -95,7 +145,7 @@ public class Field {
             };
         }
 
-        // odd rows
+        // в случае нечетного ряда
         else {
             positionsAround = new Position[]{
                     new Position(cellPos.col, cellPos.row - 1), new Position(cellPos.col + 1, cellPos.row - 1),
@@ -108,6 +158,11 @@ public class Field {
     }
 
 
+    /**
+     * Открывает клетку, при этом, если клетка пустая,
+     * то рекурсией открываются соседние.
+     * @param cellPos - позиция клетки
+     */
     void openCell(Position cellPos) {
         if (!cellExist(cellPos)) return;
 
@@ -132,6 +187,10 @@ public class Field {
     }
 
 
+    /**
+     * Помечает клетку флагом или вопросиком.
+     * @param cellPos - позиция клетки
+     */
     void markCell(Position cellPos) {
         if (!cellExist(cellPos)) return;
 
@@ -149,6 +208,9 @@ public class Field {
     }
 
 
+    /**
+     * Проверяет достигнуты ли условия для победы.
+     */
     boolean checkWin() {
         return restCells == 0 && flags == mines;
     }

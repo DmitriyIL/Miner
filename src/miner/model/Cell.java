@@ -1,5 +1,17 @@
 package miner.model;
 
+
+/**
+ * Класс, хранящий состояние клетки.
+ * У состояния 2 слоя: нижний и верхний.
+ *
+ * В нижнем хранится то что скрыто в начале игры,
+ * а именно - начилие мины и кол-во бомб вокруг. А также
+ * состояние, когда бомба взорвана.
+ *
+ * В верхнем слое хранится - помечена ли бомба флагом или вопросиком, или
+ * просто закрыта.
+ */
 public class Cell {
     static final int closedCell = 10;
     static final int questionedCell = 20;
@@ -47,5 +59,4 @@ public class Cell {
     public boolean isBlasted() {
         return state == blastedCell;
     }
-
 }
