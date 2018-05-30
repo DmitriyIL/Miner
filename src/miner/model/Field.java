@@ -42,9 +42,9 @@ public class Field {
         byte mined = (byte) (Cell.closedCell + Cell.minedCell);
         List<Position> restPositions = new LinkedList<>();
 
-        for (int heightPos = 0; heightPos < height; heightPos++)
-            for (int widthPos = 0; widthPos < width; widthPos++)
-                restPositions.add(new Position(widthPos, heightPos));
+        for (int rowPos = 0; rowPos < height; rowPos++)
+            for (int colPos = 0; colPos < width; colPos++)
+                restPositions.add(new Position(colPos, rowPos));
 
         // set mines
         for (int countMines = 0; countMines < mines; countMines++) {
@@ -62,7 +62,7 @@ public class Field {
     }
 
 
-    private byte countMinesAroundCell(Position cellPos) {
+    public byte countMinesAroundCell(Position cellPos) {
         byte result = 0;
         Position[] positionsAround = getPositionsAround(cellPos);
 
@@ -77,12 +77,12 @@ public class Field {
     }
 
 
-    public boolean cellExist(Position cellPos) {
+    private boolean cellExist(Position cellPos) {
         return cellPos.col >= 0 && cellPos.col < width && cellPos.row >= 0 && cellPos.row < height;
     }
 
 
-    public Position[] getPositionsAround(Position cellPos) {
+    private Position[] getPositionsAround(Position cellPos) {
 
         Position positionsAround[];
 
@@ -108,7 +108,7 @@ public class Field {
     }
 
 
-    public void openCell(Position cellPos) {
+    void openCell(Position cellPos) {
         if (!cellExist(cellPos)) return;
 
         Cell cell = getCell(cellPos);
@@ -132,7 +132,7 @@ public class Field {
     }
 
 
-    public void markCell(Position cellPos) {
+    void markCell(Position cellPos) {
         if (!cellExist(cellPos)) return;
 
         Cell cell = getCell(cellPos);
@@ -149,7 +149,7 @@ public class Field {
     }
 
 
-    public boolean checkWin() {
+    boolean checkWin() {
         return restCells == 0 && flags == mines;
     }
 }

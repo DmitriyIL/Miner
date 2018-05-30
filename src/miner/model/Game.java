@@ -74,17 +74,16 @@ public class Game {
     }
 
 
-    public Position fieldPointToFieldCell(int x, int y, int CellWidth, int CellHeight) {
+    private Position fieldPointToFieldCell(int x, int y, int CellWidth, int CellHeight) {
 
         float height25 = CellHeight * 0.25f; //высота пустого треугольника вверху и внизу поля
         float height75 = CellHeight * 0.75f;
-
-        int firstRow = (int) Math.floor((y - height25) / height75);
-        int lastRow = (int) Math.floor(y / height75);
-
         float width50 = CellWidth * 0.50f;
 
-        int colInEvenRow = (int) Math.floor(x / CellWidth);
+        int firstRow = (int) Math.floor((y - height25) / height75); //на одном Y могут лежать 2 ряда
+        int lastRow = (int) Math.floor(y / height75);
+
+        int colInEvenRow = (int) Math.floor(x / CellWidth);  //на одном X могут лежать 2 колонны
         int colInOddRow = (int) Math.floor((x - width50) / CellWidth);
 
         Point pressPoint = new Point(x, y);

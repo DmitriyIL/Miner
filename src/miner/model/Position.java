@@ -1,7 +1,7 @@
 package miner.model;
 
 /**
- * Позиция ячейки на поле
+ * Позиция ячейки в сетке
  */
 public class Position {
 

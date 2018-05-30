@@ -7,6 +7,27 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class FieldTest {
+
+    @Test
+    public void cellsTest() {
+        Game game = new Game(20, 15, 40);
+        Field field = game.getField();
+        Cell[][] cellsMatr = field.getCellsMatrix();
+
+        for (int colPos = 0; colPos < cellsMatr.length; colPos++) {
+            for (int rowPos = 0; rowPos < cellsMatr[0].length; rowPos++) {
+                if (cellsMatr[colPos][rowPos].isMined()) continue;
+
+                int expectedMinesAround = cellsMatr[colPos][rowPos].getState() % 10;
+                int actualMinesAround = field.countMinesAroundCell(new Position(colPos, rowPos));
+
+                assertEquals(expectedMinesAround, actualMinesAround);
+            }
+        }
+
+    }
+
+
     @Test
     public void bombTest() {
         Game game = new Game(20, 15, 40);
@@ -16,8 +37,8 @@ public class FieldTest {
         assertEquals(Game.actionGameState, game.getGameState());
 
         int bombsAmt = 0;
-        for (Cell[] cellArr: cellsMatr) {
-            for (Cell cell: cellArr) {
+        for (Cell[] cellArr : cellsMatr) {
+            for (Cell cell : cellArr) {
                 if (cell.isMined()) bombsAmt++;
             }
         }
@@ -31,9 +52,9 @@ public class FieldTest {
     }
 
     private Position findBomb(Cell[][] cellsMatr) {
-        for (int heightPos = 0; heightPos < cellsMatr.length; heightPos++) {
-            for (int widthPos = 0; widthPos < cellsMatr[0].length; widthPos++) {
-                if (cellsMatr[heightPos][widthPos].isMined()) return new Position(heightPos, widthPos);
+        for (int colPos = 0; colPos < cellsMatr.length; colPos++) {
+            for (int rowPos = 0; rowPos < cellsMatr[0].length; rowPos++) {
+                if (cellsMatr[colPos][rowPos].isMined()) return new Position(colPos, rowPos);
             }
         }
         return null;
@@ -52,8 +73,8 @@ public class FieldTest {
 
         assertTrue(cellsMatr[bombPos.col][bombPos.row].isFlaged()); //по пути проверяем флагирование
 
-        Position emptyCellPos = (bombPos.col + 2 < 20)?  // отходим на 2 клетки от бомбы, чтобы нажатием
-                new Position(bombPos.col + 2, bombPos.row) : //открыть все клетки кроме флажка
+        Position emptyCellPos = (bombPos.col + 2 < 20) ?       //отходим на 2 клетки от бомбы, чтобы нажатием
+                new Position(bombPos.col + 2, bombPos.row) :  //открыть все клетки кроме флажка
                 new Position(bombPos.col - 2, bombPos.row);
         Point emptyCellCoords = game.findCellCenter(emptyCellPos.col, emptyCellPos.row);
         game.pressLeftButton(emptyCellCoords.x, emptyCellCoords.y); //тыкаем на путсую клетку
@@ -61,4 +82,22 @@ public class FieldTest {
         assertEquals(Game.winGameState, game.getGameState());
     }
 
+
+    @Test
+    public void qustionedTest() {
+        Game game = new Game(20, 15, 40);
+        Field field = game.getField();
+        Cell[][] cellsMatr = field.getCellsMatrix();
+
+        Point cellCoords = game.findCellCenter(0, 0);
+
+        game.pressRightButton(cellCoords.x, cellCoords.y);
+        game.pressRightButton(cellCoords.x, cellCoords.y);
+
+        assertTrue(cellsMatr[0][0].isOuestioned());
+
+        game.pressLeftButton(cellCoords.x, cellCoords.y); // должна открыться
+
+        assertTrue(cellsMatr[0][0].isOpened());
+    }
 }

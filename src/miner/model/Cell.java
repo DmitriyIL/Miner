@@ -1,20 +1,15 @@
 package miner.model;
 
 public class Cell {
-    public static final int openedCell = 0;
-    public static final int closedCell = 10;
-    public static final int questionedCell = 20;
-    public static final int flagedCell = 30;
+    static final int closedCell = 10;
+    static final int questionedCell = 20;
+    static final int flagedCell = 30;
 
-    public static final int emptyCell = 0;
-    public static final int blastedCell = 8;
-    public static final int minedCell = 9;
+    static final int blastedCell = 8;
+    static final int minedCell = 9;
 
     private byte state;
 
-    public Cell(byte state) {
-        this.state = state;
-    }
 
     public Cell(int state) {
         this.state = (byte) state;
@@ -29,7 +24,7 @@ public class Cell {
     }
 
     public boolean isEmpty() {
-        return state == emptyCell;
+        return state == 0;
     }
 
     public boolean isMined() {
@@ -38,7 +33,7 @@ public class Cell {
 
 
     public boolean isOpened() {
-        return state / 10 == openedCell;
+        return state < closedCell;
     }
 
     public boolean isOuestioned() {
