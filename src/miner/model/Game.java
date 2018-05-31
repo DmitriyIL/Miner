@@ -4,7 +4,6 @@ package miner.model;
 import miner.MinerFrame;
 
 import java.awt.Point;
-import java.util.LinkedList;
 
 
 /**
@@ -27,8 +26,9 @@ public class Game {
 
     /**
      * Конструктор игрового процесса
-     * @param colsAmt - кол-во столбцов на поле.
-     * @param rowsAmt - кол-во рядов на поле.
+     *
+     * @param colsAmt  - кол-во столбцов на поле.
+     * @param rowsAmt  - кол-во рядов на поле.
      * @param minesAmt - кол-во мин на поле.
      */
     public Game(int colsAmt, int rowsAmt, int minesAmt) {
@@ -59,6 +59,7 @@ public class Game {
 
     /**
      * Обрабатывает нажатие на поле левой кнопкой мыши.
+     *
      * @param x - координата нажатия.
      * @param y - координата нажатия.
      */
@@ -88,9 +89,9 @@ public class Game {
     }
 
 
-
     /**
      * Обрабатывает нажатие на поле правой кнопкой мыши.
+     *
      * @param x - координата нажатия.
      * @param y - координата нажатия.
      */
@@ -109,51 +110,52 @@ public class Game {
 
     /**
      * Высчитывает позицию клетки, на которую нажали мышкой.
-     *
+     * <p>
      * Алгоритм:
      * Находит предполагаемые клетки на которые нажали,
      * потом путем перебора ищет минимальное расстояние
      * от точки нажатия до центра клеток.
      *
-     * @param x - координата нажатия мышкой.
-     * @param y - координата нажатия мышкой.
-     * @param CellWidth - ширина одного шестиугольника в пикселях.
-     * @param CellHeight - высота одного шестиугольника в пикселях.
+     * @param x          - координата нажатия мышкой.
+     * @param y          - координата нажатия мышкой.
+     * @param cellWidth  - ширина одного шестиугольника в пикселях.
+     * @param cellHeight - высота одного шестиугольника в пикселях.
      * @return поцицию клетки на которую нажали
      */
-    private Position fieldPointToFieldCell(int x, int y, int CellWidth, int CellHeight) {
+    private Position fieldPointToFieldCell(int x, int y, int cellWidth, int cellHeight) {
 
-        float height25 = CellHeight * 0.25f; //высота пустого треугольника вверху и внизу поля
-        float height75 = CellHeight * 0.75f;
-        float width50 = CellWidth * 0.50f;
+        float height25 = cellHeight * 0.25f; //высота пустого треугольника вверху и внизу поля
+        float height75 = cellHeight * 0.75f;
+        float width50 = cellWidth * 0.50f;
 
         int firstRow = (int) Math.floor((y - height25) / height75); //на одном Y могут лежать 2 ряда
         int lastRow = (int) Math.floor(y / height75);
 
-        int colInEvenRow = (int) Math.floor(x / CellWidth);  //на одном X могут лежать 2 колонны
-        int colInOddRow = (int) Math.floor((x - width50) / CellWidth);
+        int colInEvenRow = (int) Math.floor(x / cellWidth);  //на одном X могут лежать 2 колонны
+        int colInOddRow = (int) Math.floor((x - width50) / cellWidth);
 
         //поиск клетки с ближайшим центром
-        Point pressPoint = new Point(x, y);
-        int minDistanceToPressPoint = Integer.MAX_VALUE;
-        Position pressedCellPos = new Position(-1, -1);
+        Point pressedPoint = new Point(x, y);
+        double minDistanceToPressPoint = Double.MAX_VALUE;
+        Position pressedPos = new Position(-1, -1);
 
         for (int row = firstRow; row <= lastRow; row++) {
             int col = (row % 2 == 0) ? colInEvenRow : colInOddRow;
 
             Point center = findCellCenter(col, row);
-            double distanceToPressPoint = center.distance(pressPoint);
+            double distanceToPressPoint = center.distance(pressedPoint);
             if (distanceToPressPoint < minDistanceToPressPoint) {
-                minDistanceToPressPoint = (int) distanceToPressPoint;
-                pressedCellPos = new Position(col, row);
+                minDistanceToPressPoint = distanceToPressPoint;
+                pressedPos = new Position(col, row);
             }
         }
-        return pressedCellPos;
+        return pressedPos;
     }
 
 
     /**
      * Ищет центр клетки.
+     *
      * @param col - столбец в котором расположена клетка.
      * @param row - ряд в котором расположена клетка.
      * @return класс Point, хранящий координаты центра.

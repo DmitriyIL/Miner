@@ -47,7 +47,7 @@ public class Field {
      * @return класс Cell по классу Position.
      */
     public Cell getCell(Position pos) {
-        return cellsMatrix[pos.col][pos.row];
+        return cellsMatrix[pos.getCol()][pos.getRow()];
     }
 
 
@@ -60,30 +60,32 @@ public class Field {
 
 
     /**
-     * Создает поле с рандомным расположением мин.
-     * <p>
-     * Алгоритм:
-     * <p>
-     * Создается масссив из всех позиций restPosition.
-     * <p>
-     * Далее выбирает cлучайная позиция из restPosition,
-     * в нее устанавливаетсся мина,
-     * потом эта позиция удаляется из restPosition,
-     * это повторяется пока не буде полученно нужное кол-во бомб.
-     * <p>
-     * Далее для всех позиций в restPosition считается кол-во бомб вокруг.
+     * Создает поле со всеми закрытыми ячейками.
      */
     private void createField() {
         cellsMatrix = new Cell[cols][rows];
 
-        for (int rowPos = 0; rowPos < rows; rowPos++) {
-            for (int colPos = 0; colPos < cols; colPos++) {
+        for (int rowPos = 0; rowPos < rows; rowPos++)
+            for (int colPos = 0; colPos < cols; colPos++)
                 cellsMatrix[colPos][rowPos] = new Cell(Cell.closedCell);
-            }
-        }
     }
 
 
+    /**
+     * Установка бомб
+     *
+     * Алгоритм:
+     *
+     * Создается масссив из всех позиций restPosition.
+     *
+     * Далее выбирает cлучайная позиция из restPosition,
+     * в нее устанавливаетсся мина,
+     * потом эта позиция удаляется из restPosition,
+     * это повторяется пока не будет полученно нужное кол-во бомб.
+     *
+     * Далее для всех позиций в restPosition считается кол-во бомб вокруг.
+     * @param pressedPos - нажатая клетка, в ней не может быть бомбы.
+     */
     public void createBombs(Position pressedPos) {
         Random rand = new Random();
         List<Position> restPositions = new LinkedList<>();
@@ -94,14 +96,14 @@ public class Field {
             }
         }
 
-        restPositions.remove(pressedPos.row * cols + pressedPos.col);
+        restPositions.remove(pressedPos.getRow() * cols + pressedPos.getCol());
 
         // set mines
         for (int countMines = 0; countMines < mines; countMines++) {
             int index = rand.nextInt(restPositions.size());
             Position cellPos = restPositions.get(index);
 
-            Cell cell = cellsMatrix[cellPos.col][cellPos.row];
+            Cell cell = cellsMatrix[cellPos.getCol()][cellPos.getRow()];
             cell.setState(cell.getState() + Cell.minedCell);
 
             restPositions.remove(index);
@@ -111,7 +113,7 @@ public class Field {
         restPositions.add(pressedPos);
         for (Position cellPos : restPositions) {
             byte minesAround = countMinesAroundCell(cellPos);
-            Cell cell = cellsMatrix[cellPos.col][cellPos.row];
+            Cell cell = cellsMatrix[cellPos.getCol()][cellPos.getRow()];
             cell.setState(cell.getState() + minesAround);
         }
     }
@@ -128,8 +130,8 @@ public class Field {
 
         for (Position posAround : positionsAround) {
             if (cellExist(posAround, cols, rows)
-                    && cellsMatrix[posAround.col][posAround.row] != null
-                    && cellsMatrix[posAround.col][posAround.row].isMined())
+                    && cellsMatrix[posAround.getCol()][posAround.getRow()] != null
+                    && cellsMatrix[posAround.getCol()][posAround.getRow()].isMined())
                 result++;
         }
 
@@ -143,8 +145,8 @@ public class Field {
      * @param cellPos - позиция клетки
      */
     public static boolean cellExist(Position cellPos, int colsAmt, int rowsAmt) {
-        return cellPos.col >= 0 && cellPos.col < colsAmt &&
-                cellPos.row >= 0 && cellPos.row < rowsAmt;
+        return cellPos.getCol() >= 0 && cellPos.getCol() < colsAmt &&
+                cellPos.getRow() >= 0 && cellPos.getRow() < rowsAmt;
     }
 
 
@@ -160,20 +162,26 @@ public class Field {
         Position positionsAround[];
 
         // в случае четного ряда
-        if (cellPos.row % 2 == 0) {
+        if (cellPos.getRow() % 2 == 0) {
             positionsAround = new Position[]{
-                    new Position(cellPos.col, cellPos.row - 1), new Position(cellPos.col - 1, cellPos.row - 1),
-                    new Position(cellPos.col + 1, cellPos.row), new Position(cellPos.col - 1, cellPos.row + 1),
-                    new Position(cellPos.col, cellPos.row + 1), new Position(cellPos.col - 1, cellPos.row)
+                    new Position(cellPos.getCol(), cellPos.getRow() - 1),
+                    new Position(cellPos.getCol() - 1, cellPos.getRow() - 1),
+                    new Position(cellPos.getCol() + 1, cellPos.getRow()),
+                    new Position(cellPos.getCol() - 1, cellPos.getRow() + 1),
+                    new Position(cellPos.getCol(), cellPos.getRow() + 1),
+                    new Position(cellPos.getCol() - 1, cellPos.getRow())
             };
         }
 
         // в случае нечетного ряда
         else {
             positionsAround = new Position[]{
-                    new Position(cellPos.col, cellPos.row - 1), new Position(cellPos.col + 1, cellPos.row - 1),
-                    new Position(cellPos.col + 1, cellPos.row), new Position(cellPos.col + 1, cellPos.row + 1),
-                    new Position(cellPos.col, cellPos.row + 1), new Position(cellPos.col - 1, cellPos.row)
+                    new Position(cellPos.getCol(), cellPos.getRow() - 1),
+                    new Position(cellPos.getCol() + 1, cellPos.getRow() - 1),
+                    new Position(cellPos.getCol() + 1, cellPos.getRow()),
+                    new Position(cellPos.getCol() + 1, cellPos.getRow() + 1),
+                    new Position(cellPos.getCol(), cellPos.getRow() + 1),
+                    new Position(cellPos.getCol() - 1, cellPos.getRow())
             };
         }
 

@@ -59,10 +59,10 @@ public class FieldTest {
         assertEquals(40, bombsAmt);
 
         Position bombPos = findBomb(cellsMatr);
-        Point bombCoords = game.findCellCenter(bombPos.col, bombPos.row);
+        Point bombCoords = game.findCellCenter(bombPos.getCol(), bombPos.getRow());
         game.pressLeftButton(bombCoords.x, bombCoords.y); // иммитируем нажатие на бомбу
         assertEquals(Game.GameStatus.LOSE, game.getGameState());
-        assertTrue(cellsMatr[bombPos.col][bombPos.row].isBlasted()); //указано ли, что взорвана бомба
+        assertTrue(cellsMatr[bombPos.getCol()][bombPos.getRow()].isBlasted()); //указано ли, что взорвана бомба
     }
 
     private Position findBomb(Cell[][] cellsMatr) {
@@ -82,15 +82,15 @@ public class FieldTest {
         Cell[][] cellsMatr = field.getCellsMatrix();
 
         Position bombPos = findBomb(cellsMatr);
-        Point bombCoords = game.findCellCenter(bombPos.col, bombPos.row);
+        Point bombCoords = game.findCellCenter(bombPos.getCol(), bombPos.getRow());
         game.pressRightButton(bombCoords.x, bombCoords.y); // иммитируем флагирование бомбы
 
-        assertTrue(cellsMatr[bombPos.col][bombPos.row].isFlaged()); //по пути проверяем флагирование
+        assertTrue(cellsMatr[bombPos.getCol()][bombPos.getRow()].isFlaged()); //по пути проверяем флагирование
 
-        Position emptyCellPos = (bombPos.col + 2 < 20) ?       //отходим на 2 клетки от бомбы, чтобы нажатием
-                new Position(bombPos.col + 2, bombPos.row) :  //открыть все клетки кроме флажка
-                new Position(bombPos.col - 2, bombPos.row);
-        Point emptyCellCoords = game.findCellCenter(emptyCellPos.col, emptyCellPos.row);
+        Position emptyCellPos = (bombPos.getCol() + 2 < 20) ?       //отходим на 2 клетки от бомбы, чтобы нажатием
+                new Position(bombPos.getCol() + 2, bombPos.getRow()) :  //открыть все клетки кроме флажка
+                new Position(bombPos.getCol() - 2, bombPos.getRow());
+        Point emptyCellCoords = game.findCellCenter(emptyCellPos.getCol(), emptyCellPos.getRow());
         game.pressLeftButton(emptyCellCoords.x, emptyCellCoords.y); //тыкаем на путсую клетку
 
         assertEquals(Game.GameStatus.WIN, game.getGameState());

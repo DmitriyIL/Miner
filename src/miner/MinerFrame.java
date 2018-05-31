@@ -34,6 +34,8 @@ public class MinerFrame extends JFrame {
     public static final int pixHeight = 56; // height in pixels
 
     public static boolean firstStep = true;
+
+    
     /**
      * Запускает приложение
      */
